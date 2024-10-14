@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>XMLを読み込む例</title>
+    <style>
+      /*
+      input[type='checkbox']:checked ~ .changed {
+        color: #ff0000;
+      }
+      .changed {
+        color: #20f000;
+      }
+        */
+
+      #genre1:checked ~ .ryouiki #changed1 {
+        display: block;
+      }
+
+      #genre1:checked ~ #changed1 {
+        display: block;
+      }
+
+      #changed1 {
+        color: #20f000;
+        display: none;
+      }
+
+      #genre2:checked ~ .ryouiki #changed2 {
+        display: block;
+      }
+      #changed2 {
+        color: #20f000;
+        display: none;
+      }
+
+      #genre3:checked ~ .ryouiki #changed3 {
+        display: block;
+      }
+      #changed3 {
+        color: #20f000;
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="content">ああああああ</div>
+
+    <!---------------------- genre-area ---------------------->
+
+    <!-- ①CSSで色を変えるにはinputではなくlabelにclass付与しないといけないぽい -->
+    <!-- ①×inputをlabelタグで囲む ◯inputとlabel並列させてidとforで接続 -->
+    <!-- 例 <input type="checkbox" id="toggle" />
+                  <label for="toggle">りんご</label>         -->
+
+    <div class="genre-child-left">
+      <label for="genre1">飲食</label>
+      <input id="genre1" type="checkbox" name="genre" value="1" />
+      <br />
+      <label for="genre2">物販</label>
+      <input id="genre2" type="checkbox" name="genre" value="1" />
+      <br />
+      <label for="genre3">パフォ！</label>
+      <input id="genre3" type="checkbox" name="genre" value="1" />
+
+      <br />
+      <div class="ryouiki">
+        <div id="changed1" class="ryouiki1">たべもののりょういき</div>
+        <div id="changed2" class="ryouiki1">ぶっぱんのりょういき</div>
+        <div id="changed3" class="ryouiki1">パフォのりょういき</div>
+      </div>
+
+      <div id="changed1">これまた別のたべもののりょういき</div>
+    </div>
+
+    <!------- やっぱりlabel,inputと変更するdivは並列じゃなきゃいけないのか...? ------->
+    <!------- 並列なdevから子要素を追っていけば指定できるぞ、、！ ------->
+
+    <!---------------------- genre-areaおわり！！ ---------------------->
+
+    <div class="content">ああああああ</div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js">
+      いいいいい
+    </script>
+    <script>
+      // ここにJavaScriptコードを記述します
+      $(document).ready(function () {
+        $.ajax({
+          type: 'GET',
+          url: './data.xml', // XMLファイルのパスを指定
+          dataType: 'xml',
+          success: function (xml) {
+            $(xml)
+              .find('item')
+              .each(function () {
+                var title = $(this).find('title').text()
+                var description = $(this).find('description').text()
+
+                $('#content').append(
+                  '<h2>' + title + '</h2><p>' + description + '</p>'
+                )
+              })
+          }
+        })
+      })
+    </script>
+
+    <form name="form1">
+      <input type="checkbox" name="fruits" value="りんご" />りんご<br />
+      <input type="checkbox" name="fruits" value="バナナ" />バナナ<br />
+      <input type="checkbox" name="fruits" value="オレンジ" />オレンジ<br />
+      <input type="button" value="選択" onclick="myCheck();" />
+    </form>
+
+    <input type="checkbox" id="toggle" />
+    <label for="toggle">りんご①</label>
+
+    <label> <input type="checkbox" />りんご② </label>
+
+    <div class="changed">
+      「りんご」をクリックすると、 フォントの色が変わります。
+    </div>
+
+    <p class="changed">
+      「りんご」をクリックすると、 フォントの色が変わります。
+    </p>
+
+    <form name="form1">
+      <label class="changed">
+        <input type="checkbox" name="fruits" value="りんご" />りんご<br />
+      </label>
+      <label class="changed">
+        <input type="checkbox" name="fruits" value="バナナ" />バナナ<br />
+      </label>
+      <label class="changed">
+        <input type="checkbox" name="fruits" value="オレンジ" />オレンジ<br />
+      </label>
+      <input type="button" value="選択" onclick="myCheck();" />
+    </form>
+
+    <!-- ①CSSで色を変えるにはinputではなくlabelにclass付与しないといけないぽい -->
+    <!-- ①×inputをlabelタグで囲む ◯inputとlabel並列させてidとforで接続 -->
+
+    <script>
+      function myCheck() {
+        var flag = false // 選択されているか否かを判定する変数
+
+        for (var i = 0; i < document.form1.fruits.length; i++) {
+          // i番目のチェックボックスがチェックされているかを判定
+          if (document.form1.fruits[i].checked) {
+            flag = true
+            alert(document.form1.fruits[i].value + 'が選択されました。')
+          }
+        }
+
+        // 何も選択されていない場合の処理
+        if (!flag) {
+          alert('項目が選択されていません。')
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,64 @@
+name: Test-Frontend Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.API_HOST }}
+          username: ${{ secrets.API_USERNAME }}
+          password: ${{ secrets.API_PASSWORD }}
+          port: ${{ secrets.API_SSH_PORT }}
+          script: |
+            cd ${{ secrets.API_DEPLOY_DIR }}
+            git pull origin main
+            yarn build
+            pm2 restart ecosystem.config.js
+
+      - name: Notify Success Test-Frontend Deploy
+        if: ${{ success() }}
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
+          method: 'POST'
+          customHeaders: '{"Content-Type": "application/json"}'
+          data: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Test-Frontend自動デプロイ成功"
+                  }
+                }
+              ]
+            }
+
+      - name: Notify Failure Test-Frontend Deploy
+        if: ${{ failure() }}
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
+          method: 'POST'
+          customHeaders: '{"Content-Type": "application/json"}'
+          data: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Test-Frontend自動デプロイ失敗"
+                  }
+                }
+              ]
+            }
